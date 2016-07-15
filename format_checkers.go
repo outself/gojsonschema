@@ -1,10 +1,12 @@
 package gojsonschema
 
 import (
+	"encoding/base64"
 	"net"
 	"net/url"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -78,6 +80,17 @@ var (
 			"uri":       URIFormatChecker{},
 			"uuid":      UUIDFormatChecker{},
 			"regex":     UUIDFormatChecker{},
+			// additional
+			"boolean": BooleanChecker{},
+			"int32":   BooleanChecker{},
+			"int64":   Int64Checker{},
+			"float":   Float32Checker{},
+			"float32": Float32Checker{},
+			"float64": Float64Checker{},
+			"uint64":  Uint64Checker{},
+			"uint32":  Uint32Checker{},
+			"byte":    Base64ByteChecker{},
+			"string":  StringChecker{},
 		},
 	}
 
@@ -191,4 +204,66 @@ func (f RegexFormatChecker) IsFormat(input string) bool {
 		return false
 	}
 	return true
+}
+
+type BooleanChecker struct{}
+
+func (f BooleanChecker) IsFormat(input string) bool {
+	_, err := strconv.ParseBool(input)
+	return err == nil
+}
+
+type StringChecker struct{}
+
+func (f StringChecker) IsFormat(input string) bool {
+	return true
+}
+
+type Int32Checker struct{}
+
+func (f Int32Checker) IsFormat(input string) bool {
+	_, ok := strconv.ParseInt(input, 0, 32)
+	return ok == nil
+}
+
+type Int64Checker struct{}
+
+func (f Int64Checker) IsFormat(input string) bool {
+	_, ok := strconv.ParseInt(input, 0, 64)
+	return ok == nil
+}
+
+type Base64ByteChecker struct{}
+
+func (f Base64ByteChecker) IsFormat(input string) bool {
+	_, err := base64.StdEncoding.DecodeString(input)
+	return err == nil
+}
+
+type Uint64Checker struct{}
+
+func (f Uint64Checker) IsFormat(input string) bool {
+	_, err := strconv.ParseUint(input, 0, 64)
+	return err == nil
+}
+
+type Uint32Checker struct{}
+
+func (f Uint32Checker) IsFormat(input string) bool {
+	_, err := strconv.ParseUint(input, 0, 32)
+	return err == nil
+}
+
+type Float32Checker struct{}
+
+func (f Float32Checker) IsFormat(input string) bool {
+	_, err := strconv.ParseFloat(input, 32)
+	return err == nil
+}
+
+type Float64Checker struct{}
+
+func (f Float64Checker) IsFormat(input string) bool {
+	_, err := strconv.ParseFloat(input, 64)
+	return err == nil
 }
